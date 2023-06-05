@@ -42,7 +42,9 @@ const serviceProviderSchema = mongoose.Schema({
         type:String,
         default:""
     }
-});
+},
+{timestamps:true}
+);
 
 module.exports = mongoose.model("serviceProvider",serviceProviderSchema);
 mongoose.set('strictQuery',false)

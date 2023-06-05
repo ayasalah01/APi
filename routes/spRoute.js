@@ -31,7 +31,7 @@ router.post("/SPupdatePassword",spController.changepassword);
 router.post("/SPforgetPassword",spController.forget_password);
 router.post("/SPresetPassword",spController.reset_password);
 router.get("/SPProfile",auth,spController.getUserProfile);
-router.put("/updateSPProfile",spController.editUserProfile);
+router.put("/updateSPProfile",auth,spController.editUserProfile);
 router.delete("/SPdelete",spController.deleteUserAccount);
 router.post("/SPemailVerification",spController.sendVerificationLink);
 router.post("/createPost",auth,upload.single('image'),spController.spCreatePost);
@@ -44,7 +44,7 @@ router.get("/tourismCompany",spController.TourismCompany);
 router.get("/archaeologicalSites",spController.ArchaeologicalSites);
 router.get("/restaurantAndCafe",spController.RestaurantAndCafe);
 router.get("/transportationCompany",spController.TransportationCompany);
-router.get("/profile",auth,spController.getSP_forClient);
+router.get("/spProfile",spController.getSPProfile_forClient);
 
 
 

@@ -7,6 +7,8 @@ const randomstring = require('randomstring')
 
 const User = require('../models/userModel');
 const Pay = require("../models/payModel");
+const Cart = require("../models/cartModel");
+
 const sendMail = require("../utils/sendEmail");
 const config = require("../config/config")
 const createToken = require("../utils/createToken");
@@ -208,16 +210,17 @@ const getUserProfile = async(req,res,next)=>{
     }
 }
 const editUserProfile = async(req,res,next)=>{
-    const email = req.body.email
+    //const email = req.body.email
     try {
-        const user = await User.findOne({email:email})
-        const userData = await User.findById({_id:user._id})
+        const id = req.userId;
+       // const user = await User.findOne({email:email})
+        const userData = await User.findById({_id:id})
         if(userData){
-            const data = await User.findByIdAndUpdate({_id:user._id},{$set:req.body})
-            res.status(200).json({success:true},"user profile has been updated");
+            const data = await User.findByIdAndUpdate({_id:id},{$set:req.body});
+            res.status(200).send({success:true,msg:"user profile has been updated"})
         }
         else{
-            res.status(500).json(err)
+            res.status(500).send({success:false,msg:err.message});
         }
     } catch (error) {
         res.status(400).send({success:false, msg:error.message});
@@ -278,6 +281,49 @@ const postPayment = async(req,res,next)=>{
     }
 }
 
+//cart
+// const cart = async(req,res,next)=>{
+//     try {
+//         const data = new Cart({
+//             service:req.body.service,
+//             price:req.body.price
+//         })
+//         const cart = data.save();
+//         res.status(200).send({success:true,cart:cart});
+//     } catch (error) {
+//         res.status(500).send({success:false,msg:error.message});
+//     }
+// }
+
+const addToCart = async(req,res,next)=>{
+    try {
+        //const id = req.userId;
+        const data = await new Cart({
+            service:req.body.service,
+            amount :req.body.amount,
+            price:req.body.price,
+            category:req.body.category,
+            userId:req.userId,
+            image:req.body.image
+
+        })
+        const cart = await data.save();
+        res.status(200).send({success:true,cart:cart});
+    } catch (error) {
+        res.status(500).send({success:false,msg:error.message});
+    }
+}
+
+const getCart = async(req,res,next)=>{
+    try {
+        const id = req.userId
+        console.log(id);
+        const items = await Cart.find({userId:id})
+        res.status(200).send({success:true,cart:items});
+    } catch (error) {
+        res.status(500).send({success:false,msg:error.message});
+    }
+}
 module.exports = {
     createNewUser,
     verifyMail,
@@ -290,5 +336,7 @@ module.exports = {
     editUserProfile,
     deleteUserAccount,
     sendVerificationLink,
-    postPayment
+    postPayment,
+    addToCart,
+    getCart
 }

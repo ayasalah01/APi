@@ -25,8 +25,14 @@ const serviceSchema = mongoose.Schema({
         type:String,
         required:true,
         // enum:["Hotel","Cinema","Bazaar","Resort & Village","Natural Preserve","Tourism Company","Archaeological Site","Restaurant & Cafe","Transportation Company"]
+    },
+    sp_id:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"serviceProvider"
     }
     
-});
+},
+{timestamps:true}
+);
 
 module.exports= mongoose.model("service",serviceSchema);

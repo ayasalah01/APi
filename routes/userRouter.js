@@ -35,9 +35,10 @@ router.post("/updatePassword",userController.changepassword);
 router.post("/forgetPassword",userController.forget_password);
 router.post("/resetPassword",userController.reset_password);
 router.get("/userProfile",auth,userController.getUserProfile);
-router.put("/updateUserProfile",userController.editUserProfile);
+router.put("/updateUserProfile",auth,userController.editUserProfile);
 router.delete("/delete",userController.deleteUserAccount);
 router.post("/emailVerification",userController.sendVerificationLink);
 router.post("/pay",upload.single('image'),userController.postPayment);
-
+router.post("/cart",auth,upload.single('image'),userController.addToCart);
+router.get("/cart",auth,userController.getCart);
 module.exports = router;

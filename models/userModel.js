@@ -6,9 +6,8 @@ const userSchema = mongoose.Schema({
     email:{
         type:String,
         required:true,
-        unique: true, 
-        match: /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
-    },
+        unique: true,
+    }, 
     username:{
         type:String,
         required:true,
@@ -38,9 +37,11 @@ const userSchema = mongoose.Schema({
     token:{
         type:String,
         default:''
-    },
+    }
     
-});
+},
+{timestamps:true}
+);
 
 module.exports = mongoose.model("user",userSchema);
 
