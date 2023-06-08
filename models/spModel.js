@@ -29,7 +29,7 @@ const serviceProviderSchema = mongoose.Schema({
     category:{
         type:String,
         required:true,
-        enum:["Hotel","Cinema","Bazaar","Resort & Village","Natural Preserves","Tourism Company","Archaeological Sites","Restaurant & Cafe","Transportation Company"]
+        enum:["Hotel","Cinema","Bazaar","Village & Resort ","Tourism Company","Restaurant & Cafe","Transport company"]
     },
     phoneNumber:{
         type:String,

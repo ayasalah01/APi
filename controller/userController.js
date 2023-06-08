@@ -1,6 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const mongoose = require("mongoose");
 const nodemailer = require('nodemailer');
 const randomstring = require('randomstring')
@@ -78,7 +78,7 @@ const postSignin = async(req,res,next)=>{
                 }
                 else{
                 const tokenData = await createToken(userData._id);
-                    res.status(201).json({
+                    res.status(201).send({
                         success:true,
                         message: "Signin successfully",
                         userData:userData,
@@ -87,7 +87,7 @@ const postSignin = async(req,res,next)=>{
                 }
             }
             else{
-                res.status(201).json({success:false ,message: "password is incorrect"});
+                res.status(201).send({success:false ,message: "password is incorrect"});
             }
         }
         else{
@@ -119,49 +119,72 @@ const logout = async(req,res, next) =>{
     // });
 } 
 // update password
-
-const changepassword = async(req,res,next)=>
-{
+const update_password = async(req,res,next)=>{
     try {
-        const email = req.body.email;
-        const password = req.body.password;
-        const user = await User.findOne({email:email})
-        const data = await User.findOne({_id:user._id})
-            if(data)
-            {
-            const newpassword = securePassword(password);
-            const userData = await User.findByIdAndUpdate(
-                        {
-                            _id:user._id
-                        },
-                        {
-                            $set:{
-                                password: newpassword
-                            }
-                        }).then(
-                            res.status(200).send({success:true,msg:"password has been updated"})
-                        )
-    }
-        else{
-            res.status(400).send({success:false, msg:"you can not update your password"});
+        const id = req.userId;
+        //const email = req.body.email
+        const old_password = req.body.old_password
+        const new_password = req.body.new_password
+        const userData = await User.findById({_id:id})
+        
+        if (userData) {
+            const passwordMatch = await bcrypt.compare(old_password,userData.password)
+            if (passwordMatch){
+                console.log(new_password)
+                const hashedPassword = await securePassword(new_password)
+                await User.updateOne({_id:userData._id},{$set:{password:hashedPassword}});
+                const tokenData = await createToken(userData._id);
+                res.status(200).send({success:true , message:"successfully user password has been updated",token:tokenData});
+                
+            }
+            else{
+                res.status(201).send({success:false ,message: "old password is incorrect"});
+            }
         }
-    
+        else{
+            res.status(400).send({success:false ,message: "data is incorrect"});
+        }
+        
     } catch (error) {
-        res.status(400).send({success:false},error.message);
+        console.log(error)
     }
 }
+
+// const changepassword = async(req,res,next)=>
+// {
+//     try {
+//         const email = req.body.email;
+//         const password = req.body.password;
+//         const newpassword = req.body.newpassword;
+//         const user = await User.findOne({email:email})
+//         const data = await User.findOne({_id:user._id})
+//         const passwordMatch = await bcrypt.compare(password,data.password);
+//             if (passwordMatch)
+//             {
+//             const new_password = securePassword(newpassword);
+//             const userData = await User.findByIdAndUpdate({ _id:user._id},{ $set:{password: new_password}},{new:true})
+//                 res.status(200).send({success:true,msg:"password has been updated"})
+                        
+//     }
+//         else{
+//             res.status(500).send({success:false, msg:"you can not update your password"});
+//         }
+    
+//     } catch (error) {
+//         res.status(400).send({success:false},error.message);
+//     }
+// }
 // forget password
 const forget_password = async(req,res,next)=>{
     try{
         const email = req.body.email
         const userData = await User.findOne({ email:email })
-        console.log(userData.email)
+        console.log(userData.email);
         if(userData){
             const randomString = randomstring.generate();
             const Data = await User.updateOne({email:email},{$set:{token:randomString}});
             sendMail.sendResetPasswordMail(userData.email,randomString);
             res.status(200).send({success:true, msg:"Please check your email inbox"})
-
         }
         else{
             res.status(200).send({success:true, msg:"this email does not exists"})
@@ -178,14 +201,10 @@ const reset_password = async(req,res,next)=>{
         const token = req.query.token;
         const tokenData = await User.findOne({token:token})
         if(tokenData){
-            const password = req.body.password;
-            const  newPassword = securePassword(password)
-            const UserData = await User.findByIdAndUpdate({ _id:tokenData._id},{$set:{ password:newPassword,token:""}},
-                {
-                    new:true
-                }).then(
-                    res.status(200).send({success:true, msg:"password has been reset"})
-                )
+            const new_password = req.body.new_password;
+            const  hashedPassword = await securePassword(new_password)
+            await User.updateOne({ _id:tokenData._id},{$set:{ password:hashedPassword,token:""}});
+            res.status(200).send({success:true, msg:"password has been reseted"})
         }
         else{
             res.status(200).send({success:false, msg:"This link has been expired"})
@@ -234,6 +253,7 @@ const deleteUserAccount = async(req,res,next)=>{
             const userData = await User.findOne({email:email})
             const user = await User.findByIdAndDelete({_id:userData._id})
             res.status(200).send({success:true, msg:"Account has been deleted"});
+            sendMail.sendMsg_deleteAccountMail(userData.email)
         } catch (error) {
             res.status(400).send({success:false, msg:error.message});
         }
@@ -329,7 +349,7 @@ module.exports = {
     verifyMail,
     postSignin,
     logout,
-    changepassword,
+    update_password,
     forget_password,
     reset_password,
     getUserProfile,
@@ -338,5 +358,6 @@ module.exports = {
     sendVerificationLink,
     postPayment,
     addToCart,
-    getCart
+    getCart,
+    
 }

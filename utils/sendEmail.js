@@ -103,30 +103,29 @@ const sendResetPasswordMail = (email,token)=>{
 //send sp resetPassword
 const sendSPResetPasswordMail = async(email,token) =>{
     try {
-        const transporter = nodemailer.createTransport({
+        const transporter = nodemailer.createTransport
+        ({
             host:'smtp.gmail.com',
             port:587,
             secure:false,
             requireTLS:true,
             auth:{
                 user:config.emailUser,
-                pass:config.emailPassword,
+                pass:config.passwordUser
             }
         });
         const mailOptions = {
             from:config.emailUser,
             to:email,
-            subject:'For reset password',
-            html:"<p> hii "+',Please copy the link <a href ="http://api-mtgy.onrender.com/reset-password?token='+token+'"> and reset your password</a>'
-        }
-        transporter.sendMail(mailOptions,(error,info)=>{
-            if(error){
-                console.log(error)
+            subject:'For Reset password',
+            html:"<p> hii "+',Please copy the link to <a href ="http://api-mtgy.onrender.com/reset-password?token='+token+'"> Reset</a> your password.</p>'
+        };
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Email sent: ' + info.response);
             }
-            else{
-                console.log("Mail has been sent :",info.response);
-            }
-
         })
     } 
     catch (error) {
@@ -170,7 +169,41 @@ const sendAdminNotifyMail = (title,details,price,category,serviceName,image)=>{
     }
 
 }
+//send message for delete account 
+const sendMsg_deleteAccountMail = (email)=>{
+    try {
+        const transporter = nodemailer.createTransport
+        ({
+            host:'smtp.gmail.com',
+            port:587,
+            secure:false,
+            requireTLS:true,
+            auth:{
+                user:config.emailUser,
+                pass:config.passwordUser
+            }
+        });
+            const mailOptions = {
+                from: config.emailUser,
+                to: email,
+                subject: 'Acount Deleted',
+                html:
+                '<h3> successfully your account has been deleted</h3>'
+            };
+            
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
+            })
 
+    } catch (error) {
+        console.log(error)
+    }
+
+}
 
 
 module.exports = {
@@ -178,5 +211,6 @@ module.exports = {
     sendSPVerificationMail,
     sendResetPasswordMail,
     sendSPResetPasswordMail,
-    sendAdminNotifyMail
+    sendAdminNotifyMail,
+    sendMsg_deleteAccountMail
 }

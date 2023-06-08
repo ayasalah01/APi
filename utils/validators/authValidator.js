@@ -57,3 +57,46 @@ check('password')
 
 validatorMiddleware,
 ];
+
+exports.changePassword = [
+    check('old_password')
+    .notEmpty()
+    .withMessage('old password required')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters'),
+    check('new_password')
+    .notEmpty()
+    .withMessage('New Password required')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters')
+    .custom((new_password, { req }) => {
+        if (new_password !== req.body.passwordConfirm) {
+        throw new Error('Password Confirmation incorrect');
+    }
+        return true;
+    }),
+    check('passwordConfirm')
+    .notEmpty()
+    .withMessage('Password confirmation required'),
+
+validatorMiddleware,
+];
+
+exports.resetValidator = [
+    check('new_password')
+    .notEmpty()
+    .withMessage('New Password required')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters')
+    .custom((new_password, { req }) => {
+        if (new_password !== req.body.passwordConfirm) {
+        throw new Error('Password Confirmation incorrect');
+    }
+        return true;
+    }),
+    check('passwordConfirm')
+    .notEmpty()
+    .withMessage('Password confirmation required'),
+
+validatorMiddleware,
+];

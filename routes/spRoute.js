@@ -20,6 +20,8 @@ const spController = require('../controller/spController');
 const {
     signupValidator,
     loginValidator,
+    changePassword,
+    resetValidator
 } = require('../utils/validators/authSPValidator');
 const auth = require("../middlewares/auth");
 
@@ -27,9 +29,11 @@ router.post("/SPsignup",signupValidator,spController.createNewUser);
 router.get("/SPverify",spController.verifyMail);
 router.post("/SPsignin",loginValidator,spController.postSignin);
 router.put("/SPlogout",spController.logout);
-router.post("/SPupdatePassword",spController.changepassword);
+router.post("/SPupdatePassword",auth,changePassword,spController.update_password);
 router.post("/SPforgetPassword",spController.forget_password);
-router.post("/SPresetPassword",spController.reset_password);
+//router.post("/SPresetPassword",spController.reset_password);
+router.post("/reset-password",resetValidator,spController.reset_password);
+
 router.get("/SPProfile",auth,spController.getUserProfile);
 router.put("/updateSPProfile",auth,spController.editUserProfile);
 router.delete("/SPdelete",spController.deleteUserAccount);

@@ -119,43 +119,70 @@ const logout = (req,res, next) =>{
     // });
 } 
 // update password
-
-const changepassword = async(req,res,next)=>
-{
+const update_password = async(req,res,next)=>{
     try {
-        const email = req.body.email;
-        const password = req.body.password;
-
-        const user = await ServiceProvider.findOne({email:email})
-        const data = await ServiceProvider.findOne({_id:user._id})
-            if(data)
-            {
-            const newpassword = securePassword(password);
-            const userData = await ServiceProvider.findByIdAndUpdate(
-                        {
-                            _id:user._id
-                        },
-                        {
-                            $set:{
-                                password: newpassword
-                            }
-                        }).then(
-                            res.status(200).send({success:true,msg:"password has been updated"})
-                        )
-    }
-        else{
-            res.status(400).send({success:false, msg:"you can not update your password"});
+        const id = req.userId;
+        const old_password = req.body.old_password
+        const new_password = req.body.new_password
+        const userData = await ServiceProvider.findById({_id:id})
+        
+        if (userData) {
+            const passwordMatch = await bcrypt.compare(old_password,userData.password)
+            if (passwordMatch){
+                const hashedPassword = await securePassword(new_password)
+                await ServiceProvider.updateOne({_id:userData._id},{$set:{password:hashedPassword}});
+                const tokenData = await createToken(userData._id);
+                res.status(200).send({success:true , message:"successfully user password has been updated",token:tokenData});
+                
+            }
+            else{
+                res.status(201).send({success:false ,message: "old password is incorrect"});
+            }
         }
-    
+        else{
+            res.status(400).send({success:false ,message: "data is incorrect"});
+        }
+        
     } catch (error) {
-        res.status(400).send({success:false},error.message);
+        console.log(error)
     }
 }
+// const changepassword = async(req,res,next)=>
+// {
+//     try {
+//         const email = req.body.email;
+//         const password = req.body.password;
+
+//         const user = await ServiceProvider.findOne({email:email})
+//         const data = await ServiceProvider.findOne({_id:user._id})
+//             if(data)
+//             {
+//             const newpassword = securePassword(password);
+//             const userData = await ServiceProvider.findByIdAndUpdate(
+//                         {
+//                             _id:user._id
+//                         },
+//                         {
+//                             $set:{
+//                                 password: newpassword
+//                             }
+//                         }).then(
+//                             res.status(200).send({success:true,msg:"password has been updated"})
+//                         )
+//     }
+//         else{
+//             res.status(400).send({success:false, msg:"you can not update your password"});
+//         }
+    
+//     } catch (error) {
+//         res.status(400).send({success:false},error.message);
+//     }
+// }
 const forget_password = async(req,res,next)=>{
     try{
         const email = req.body.email
-        const userData = await ServiceProvider.findOne({ email:email })
-        console.log(userData.email)
+        const userData = await ServiceProvider.findOne({email:email})
+        console.log(userData.email);
         if(userData){
             const randomString = randomstring.generate();
             const Data = await ServiceProvider.updateOne({email:email},{$set:{token:randomString}});
@@ -176,19 +203,17 @@ const forget_password = async(req,res,next)=>{
 const reset_password = async(req,res,next)=>{
     try {
         const token = req.query.token;
+        
         const tokenData = await ServiceProvider.findOne({token:token})
         if(tokenData){
-            const password = req.body.password;
-            const  newPassword = securePassword(password)
-            const UserData = await ServiceProvider.findByIdAndUpdate({ _id:tokenData._id},{$set:{ password:newPassword}},
-                {
-                    new:true
-                }).then(
-                    res.status(200).send({success:true, msg:"password has been reset"})
-                )
+            const new_password = req.body.new_password;
+            const  hashedPassword = await securePassword(new_password);
+            
+            await ServiceProvider.updateOne({ _id:tokenData._id},{$set:{password:hashedPassword}})
+            res.status(200).send({success:true, msg:"password has been reseted"})
         }
         else{
-            res.status(200).send({success:false, msg:"This link has been expired"})
+            res.status(201).send({success:false, msg:"This link has been expired"})
         }
         
     } catch (error) {
@@ -208,7 +233,7 @@ const getUserProfile = async(req,res,next)=>{
     }
 
 }
-const editUserProfile = async(req,res,next)=>{
+const editUserProfile = async(req,res,next)=>{  
     //const email = req.body.email
     try {
         const id = req.userId;
@@ -232,6 +257,7 @@ const deleteUserAccount = async(req,res,next)=>{
         try {
             const userData = await ServiceProvider.findOne({email:email})
             const user = await ServiceProvider.findByIdAndDelete({_id:userData._id})
+            sendMail.sendMsg_deleteAccountMail(userData.email);
             res.status(200).send({success:true, msg:"Account has been deleted"});
         } catch (error) {
             res.status(400).send({success:false, msg:error.message});
@@ -348,6 +374,7 @@ const ResortAndVillage = async(req,res,next)=>{
 const NaturalPreserves = async(req,res,next)=>{
     try {
         const users = await Services.find({category:"Natural Preserves"});
+        
         res.status(200).send({success:true, data:users});
     } catch (error) {
         console.log(error.message);
@@ -479,7 +506,7 @@ module.exports = {
     postSignin,
     verfiyLogin,
     logout,
-    changepassword,
+    update_password,
     forget_password,
     reset_password,
     getUserProfile,

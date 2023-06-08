@@ -23,6 +23,8 @@ const userController = require("../controller/userController");
 const {
     signupValidator,
     loginValidator,
+    changePassword,
+    resetValidator
 } = require('../utils/validators/authValidator');
 
 const auth = require("../middlewares/auth");
@@ -31,9 +33,9 @@ router.post("/signup",signupValidator,userController.createNewUser);
 router.get("/verify",userController.verifyMail);
 router.post("/signin",loginValidator,userController.postSignin);
 router.get("/signout",auth,userController.logout);
-router.post("/updatePassword",userController.changepassword);
+router.post("/updatePassword",changePassword,userController.update_password);
 router.post("/forgetPassword",userController.forget_password);
-router.post("/resetPassword",userController.reset_password);
+router.post("/resetPassword",resetValidator,userController.reset_password);
 router.get("/userProfile",auth,userController.getUserProfile);
 router.put("/updateUserProfile",auth,userController.editUserProfile);
 router.delete("/delete",userController.deleteUserAccount);
