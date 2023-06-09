@@ -8,6 +8,7 @@ const randomstring = require("randomstring");
 const sendMail = require("../utils/sendEmail")
 const ServiceProvider = require('../models/spModel');
 const Services = require("../models/serviceModel");
+const Natural = require("../models/natural")
 const createToken = require("../utils/createToken");
 const auth = require("../middlewares/auth");
 
@@ -147,37 +148,8 @@ const update_password = async(req,res,next)=>{
         console.log(error)
     }
 }
-// const changepassword = async(req,res,next)=>
-// {
-//     try {
-//         const email = req.body.email;
-//         const password = req.body.password;
 
-//         const user = await ServiceProvider.findOne({email:email})
-//         const data = await ServiceProvider.findOne({_id:user._id})
-//             if(data)
-//             {
-//             const newpassword = securePassword(password);
-//             const userData = await ServiceProvider.findByIdAndUpdate(
-//                         {
-//                             _id:user._id
-//                         },
-//                         {
-//                             $set:{
-//                                 password: newpassword
-//                             }
-//                         }).then(
-//                             res.status(200).send({success:true,msg:"password has been updated"})
-//                         )
-//     }
-//         else{
-//             res.status(400).send({success:false, msg:"you can not update your password"});
-//         }
-    
-//     } catch (error) {
-//         res.status(400).send({success:false},error.message);
-//     }
-// }
+//reset forgetten password
 const forget_password = async(req,res,next)=>{
     try{
         const email = req.body.email
@@ -199,7 +171,6 @@ const forget_password = async(req,res,next)=>{
         res.status(400).send({success:false, msg:error.message});
     }
 }
-
 const reset_password = async(req,res,next)=>{
     try {
         const token = req.query.token;
@@ -250,7 +221,6 @@ const editUserProfile = async(req,res,next)=>{
         res.status(400).send({success:false, msg:error.message});
     }
 }
-
 const deleteUserAccount = async(req,res,next)=>{
     const email = req.body.email;
     if(email){
@@ -287,28 +257,6 @@ const sendVerificationLink = async (req,res,next)=>{
     }
 }
 //create post
-// const createPost = async(req,res,next)=>{
-//     try {
-//         const category = req.body.category
-//         const user = await ServiceProvider.findOne({category:category})
-
-//         MongoClient.connect('mongodb://127.0.0.1:27017' ,{useNewUrlParser: true}, (err, client)=> {
-//             var database = client.db("mydatabase");
-//             database.collection(user.category).insertOne({
-//             serviceName:user.serviceName,
-//             postDetails:req.body.postDetails,
-//             image:req.file.filename
-//         }).then(post =>{
-//             console.log(post);
-//         })
-//         })
-//         res.status(200).send({success:true, message:"created post successful"});
-        
-//     } catch (error) {
-//         console.log(error.message);
-//     }
-// }
-
 const spCreatePost = async(req,res,next)=>{
     try {
         const id = req.userId;
@@ -373,7 +321,14 @@ const ResortAndVillage = async(req,res,next)=>{
 }
 const NaturalPreserves = async(req,res,next)=>{
     try {
-        const users = await Services.find({category:"Natural Preserves"});
+        // const data = new Natural({
+        //     serviceName:req.body.serviceName,
+        //     About :req.body.About,
+        //     image:req.file.filename,
+        //     available_time : req.body.time
+        // });
+        // await data.save()
+        const users = await Natural.find({category:"Natural Preserves"});
         
         res.status(200).send({success:true, data:users});
     } catch (error) {
@@ -390,7 +345,7 @@ const TourismCompany = async(req,res,next)=>{
 }
 const ArchaeologicalSites = async(req,res,next)=>{
     try {
-        const users = await Services.find({category:"Archaeological Sites"});
+        const users = await Natural.find({category:"Archaeological Sites"});
         res.status(200).send({success:true, data:users});
     } catch (error) {
         console.log(error.message);
@@ -413,82 +368,6 @@ const TransportationCompany = async(req,res,next)=>{
     }
 }
 //get sp profile for user
-// const getSP_forClient = async (req,res,next)=>{
-//     try {
-//         // const id = req.userId;
-//         // const userData = await ServiceProvider.findById({_id:id})
-//         // const category = userData.category;
-//         if ("Hotel"){
-//             const userData = await Services.findOne({category:"Hotel"});
-//             console.log(userData.serviceName);
-//             const data = await ServiceProvider.findOne({serviceName:userData.serviceName});
-//             console.log(data);
-//             res.status(200).send({success:true,Partner_Profile:data});
-//         }
-//         else if (" Cinema"){
-//             const userData = await Services.findOne({category:"Cinema"});
-//             console.log(userData.serviceName);
-//             const data = await ServiceProvider.findOne({serviceName:userData.serviceName});
-//             console.log(data);
-//             res.status(200).send({success:true,Partner_Profile:data});
-//         }
-//         else if ("Bazaar"){
-//             const userData = await Services.findOne({category:"Bazaar"});
-//             console.log(userData.serviceName);
-//             const data = await ServiceProvider.findOne({serviceName:userData.serviceName});
-//             console.log(data);
-//             res.status(200).send({success:true,Partner_Profile:data});
-//         }
-//         else if ("Resort & Village"){
-//             const userData = await Services.findOne({category:"Resort & Village"});
-//             console.log(userData.serviceName);
-//             const data = await ServiceProvider.findOne({serviceName:userData.serviceName});
-//             console.log(data);
-//             res.status(200).send({success:true,Partner_Profile:data});
-//         }
-//         else if ("Natural Preserve"){
-//             const userData = await Services.findOne({category:"Natural Preserve"});
-//             console.log(userData.serviceName);
-//             const data = await ServiceProvider.findOne({serviceName:userData.serviceName});
-//             console.log(data);
-//             res.status(200).send({success:true,Partner_Profile:data});
-//         }
-//         else if ("Tourism Company"){
-//             const userData = await Services.findOne({category:"Tourism Company"});
-//             console.log(userData.serviceName);
-//             const data = await ServiceProvider.findOne({serviceName:userData.serviceName});
-//             console.log(data);
-//             res.status(200).send({success:true,Partner_Profile:data});
-//         }
-//         else if ("Archaeological Site"){
-//             const userData = await Services.findOne({category:"Archaeological Site"});
-//             console.log(userData.serviceName);
-//             const data = await ServiceProvider.findOne({serviceName:userData.serviceName});
-//             console.log(data);
-//             res.status(200).send({success:true,Partner_Profile:data});
-//         }
-//         else if ("Restaurant & Cafe"){
-//             const userData = await Services.findOne({category:"Restaurant & Cafe"});
-//             console.log(userData.serviceName);
-//             const data = await ServiceProvider.findOne({serviceName:userData.serviceName});
-//             console.log(data);
-//             res.status(200).send({success:true,Partner_Profile:data});
-//         }
-//         else if ("Transportation Company"){
-//             const userData = await Services.findOne({category:"Transportation Company"});
-//             console.log(userData.serviceName);
-//             const data = await ServiceProvider.findOne({serviceName:userData.serviceName});
-//             console.log(data);
-//             res.status(200).send({success:true,Partner_Profile:data});
-//         }
-//         else{
-//             console.log("category not exit")
-//         }
-        
-//     } catch (error) {
-//         console.log(error.message);
-//     }
-// }
 const getSPProfile_forClient = async(req,res,next)=>{
     try {
         const id = req.params.id

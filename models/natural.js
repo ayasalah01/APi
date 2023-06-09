@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const serviceSchema = mongoose.Schema({
+const naturalSchema = mongoose.Schema({
     serviceName:{
         type:String,
         required:true
@@ -14,11 +14,17 @@ const serviceSchema = mongoose.Schema({
         required:true
     },
     available_time:{
-        type:Time,
+        type:String,
+    },
+    available_time:{
+        type:String,
+    },
+    category:{
+        type:String,
     }
     
 },
 {timestamps:true}
 );
 
-module.exports= mongoose.model("service",serviceSchema);
+module.exports= mongoose.model("natural",naturalSchema);

@@ -31,23 +31,21 @@ router.post("/SPsignin",loginValidator,spController.postSignin);
 router.put("/SPlogout",spController.logout);
 router.post("/SPupdatePassword",auth,changePassword,spController.update_password);
 router.post("/SPforgetPassword",spController.forget_password);
-//router.post("/SPresetPassword",spController.reset_password);
 router.post("/reset-password",resetValidator,spController.reset_password);
-
 router.get("/SPProfile",auth,spController.getUserProfile);
 router.put("/updateSPProfile",auth,spController.editUserProfile);
 router.delete("/SPdelete",spController.deleteUserAccount);
 router.post("/SPemailVerification",spController.sendVerificationLink);
 router.post("/createPost",auth,upload.single('image'),spController.spCreatePost);
-router.get("/hotel",spController.Hotel);
-router.get("/cinema",spController.Cinema);
-router.get("/bazaar",spController.Bazaar);
-router.get("/resortAndVillage",spController.ResortAndVillage);
-router.get("/naturalPreserves",spController.NaturalPreserves);
-router.get("/tourismCompany",spController.TourismCompany);
-router.get("/archaeologicalSites",spController.ArchaeologicalSites);
-router.get("/restaurantAndCafe",spController.RestaurantAndCafe);
-router.get("/transportationCompany",spController.TransportationCompany);
+router.get("/Hotel",spController.Hotel);
+router.get("/Cinema",spController.Cinema);
+router.get("/Bazaar",spController.Bazaar);
+router.get("/ResortAndVillage",spController.ResortAndVillage);
+router.get("/NaturalPreserves",spController.NaturalPreserves);
+router.get("/TourismCompany",spController.TourismCompany);
+router.get("/ArchaeologicalSites",spController.ArchaeologicalSites);
+router.get("/RestaurantAndCafe",spController.RestaurantAndCafe);
+router.get("/TransportationCompany",spController.TransportationCompany);
 router.get("/spProfile",spController.getSPProfile_forClient);
 
 

@@ -150,31 +150,7 @@ const update_password = async(req,res,next)=>{
     }
 }
 
-// const changepassword = async(req,res,next)=>
-// {
-//     try {
-//         const email = req.body.email;
-//         const password = req.body.password;
-//         const newpassword = req.body.newpassword;
-//         const user = await User.findOne({email:email})
-//         const data = await User.findOne({_id:user._id})
-//         const passwordMatch = await bcrypt.compare(password,data.password);
-//             if (passwordMatch)
-//             {
-//             const new_password = securePassword(newpassword);
-//             const userData = await User.findByIdAndUpdate({ _id:user._id},{ $set:{password: new_password}},{new:true})
-//                 res.status(200).send({success:true,msg:"password has been updated"})
-                        
-//     }
-//         else{
-//             res.status(500).send({success:false, msg:"you can not update your password"});
-//         }
-    
-//     } catch (error) {
-//         res.status(400).send({success:false},error.message);
-//     }
-// }
-// forget password
+// reset forgetten password
 const forget_password = async(req,res,next)=>{
     try{
         const email = req.body.email
@@ -245,7 +221,6 @@ const editUserProfile = async(req,res,next)=>{
         res.status(400).send({success:false, msg:error.message});
     }
 }
-
 const deleteUserAccount = async(req,res,next)=>{
     const email = req.body.email;
     if(email){
@@ -263,7 +238,6 @@ const deleteUserAccount = async(req,res,next)=>{
         res.status(400).json("your email not exit and can not delete your account")
     }
 }
-
 // reset verfiy email
 const sendVerificationLink = async (req,res,next)=>{
     try {
@@ -282,7 +256,6 @@ const sendVerificationLink = async (req,res,next)=>{
         console.log(error.message);
     }
 }
-
 //payment method
 const postPayment = async(req,res,next)=>{
     try {
@@ -302,19 +275,6 @@ const postPayment = async(req,res,next)=>{
 }
 
 //cart
-// const cart = async(req,res,next)=>{
-//     try {
-//         const data = new Cart({
-//             service:req.body.service,
-//             price:req.body.price
-//         })
-//         const cart = data.save();
-//         res.status(200).send({success:true,cart:cart});
-//     } catch (error) {
-//         res.status(500).send({success:false,msg:error.message});
-//     }
-// }
-
 const addToCart = async(req,res,next)=>{
     try {
         //const id = req.userId;
@@ -333,7 +293,6 @@ const addToCart = async(req,res,next)=>{
         res.status(500).send({success:false,msg:error.message});
     }
 }
-
 const getCart = async(req,res,next)=>{
     try {
         const id = req.userId
