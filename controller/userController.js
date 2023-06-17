@@ -126,7 +126,6 @@ const update_password = async(req,res,next)=>{
         const old_password = req.body.old_password
         const new_password = req.body.new_password
         const userData = await User.findById({_id:id})
-        
         if (userData) {
             const passwordMatch = await bcrypt.compare(old_password,userData.password)
             if (passwordMatch){
