@@ -28,7 +28,7 @@ const auth = require("../middlewares/auth");
 router.post("/SPsignup",signupValidator,spController.createNewUser);
 router.get("/SPverify",spController.verifyMail);
 router.post("/SPsignin",loginValidator,spController.postSignin);
-router.put("/SPlogout",spController.logout);
+router.get("/SPlogout",auth,spController.logout);
 router.post("/SPupdatePassword",auth,changePassword,spController.update_password);
 router.post("/SPforgetPassword",spController.forget_password);
 router.post("/reset-password",resetValidator,spController.reset_password);

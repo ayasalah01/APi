@@ -171,11 +171,14 @@ const forget_password = async(req,res,next)=>{
     }
 
 }
+
 const reset_password = async(req,res,next)=>{
     try {
         const token = req.query.token;
-        const tokenData = await User.findOne({token:token})
+        const tokenData = await User.findOne({token:token});
+        
         if(tokenData){
+            res.render("resetPassword",{pageTitle:"ResetPassword",user_id:tokenData._id});
             const new_password = req.body.new_password;
             const  hashedPassword = await securePassword(new_password)
             await User.updateOne({ _id:tokenData._id},{$set:{ password:hashedPassword,token:""}});
@@ -317,5 +320,6 @@ module.exports = {
     postPayment,
     addToCart,
     getCart,
+    
     
 }
