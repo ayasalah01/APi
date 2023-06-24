@@ -35,6 +35,7 @@ router.post("/signin",loginValidator,userController.postSignin);
 router.get("/signout",auth,userController.logout);
 router.post("/updatePassword",auth,changePassword,userController.update_password);
 router.post("/forgetPassword",userController.forget_password);
+//router.get("/resetPassword",userController.getRest)
 router.post("/resetPassword",resetValidator,userController.reset_password);
 router.get("/userProfile",auth,userController.getUserProfile);
 router.put("/updateUserProfile",auth,userController.editUserProfile);
@@ -43,4 +44,5 @@ router.post("/emailVerification",userController.sendVerificationLink);
 router.post("/pay",upload.single('image'),userController.postPayment);
 router.post("/cart",auth,upload.single('image'),userController.addToCart);
 router.get("/cart",auth,userController.getCart);
+router.post("/search",userController.Search);
 module.exports = router;

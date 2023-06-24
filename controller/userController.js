@@ -8,6 +8,7 @@ const randomstring = require('randomstring')
 const User = require('../models/userModel');
 const Pay = require("../models/payModel");
 const Cart = require("../models/cartModel");
+const Services = require("../models/serviceModel");
 
 const sendMail = require("../utils/sendEmail");
 const config = require("../config/config")
@@ -171,12 +172,40 @@ const forget_password = async(req,res,next)=>{
     }
 
 }
+// const getRest = async(req,res,next)=>{
+//     try {
+//         const token = req.query.token;
+//         const tokenData = await User.findOne({token:token});
+//         if(tokenData){
+//             res.render("resetPassword",{pageTitle:"ResetPassword",user_id:tokenData._id});
+//         }
+//         else{
+//             res.render("404",{message:"token is invalid"});
+//         }
+//     } catch (error) {
+//         console.log(error)
+//     }
+// }
+// const reset_password = async(req,res,next)=>{
+//     try {
+//             const token = req.query.token;
+//             const tokenData = await User.findOne({token:token});
+//             const new_password = req.body.new_password;
+            
+//             const  hashedPassword = await securePassword(new_password)
+//             await User.updateOne({ _id:tokenData._id},{$set:{ password:hashedPassword,token:""}});
+//             res.status(200).json({success:true, msg:"password has been reseted"})
+        
+        
+//     } catch (error) {
+//         res.status(400).send({success:false, msg:error.message});
+//     }
 
+// }
 const reset_password = async(req,res,next)=>{
     try {
         const token = req.query.token;
         const tokenData = await User.findOne({token:token});
-        
         if(tokenData){
             res.render("resetPassword",{pageTitle:"ResetPassword",user_id:tokenData._id});
             const new_password = req.body.new_password;
@@ -275,7 +304,6 @@ const postPayment = async(req,res,next)=>{
         console.log(error.message);
     }
 }
-
 //cart
 const addToCart = async(req,res,next)=>{
     try {
@@ -305,6 +333,19 @@ const getCart = async(req,res,next)=>{
         res.status(500).send({success:false,msg:error.message});
     }
 }
+const Search = async(req,res,next)=>{
+    try {
+        const service = req.body.service;
+        console.log(service)
+        const data = await Services.findOne({serviceName:service});
+        console.log(data)
+        res.status(200).send({success:true,data:data});
+        // res.render("resultSearch",{data:data});
+        //res.render("/search",{data:data})
+    } catch (error) {
+        console.log(error)
+    }
+}
 module.exports = {
     createNewUser,
     verifyMail,
@@ -320,6 +361,7 @@ module.exports = {
     postPayment,
     addToCart,
     getCart,
+    Search
     
     
 }
