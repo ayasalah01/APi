@@ -66,6 +66,7 @@ const postSignin = async(req,res,next)=>{
         const password = req.body.password;
 
         const userData = await ServiceProvider.findOne({email:email})
+        console.log(userData);
         if(userData){
             const passwordMatch = await bcrypt.compare(password,userData.password);
             if (passwordMatch){
@@ -210,7 +211,7 @@ const editUserProfile = async(req,res,next)=>{
         //const user = await ServiceProvider.findOne({email:email})
         const userData = await ServiceProvider.findById({_id:id})
         if(userData){
-            const data = await ServiceProvider.findByIdAndUpdate({_id:id},{$set:req.body})
+            const data = await ServiceProvider.findByIdAndUpdate({_id:id},{$set:{serviceName:req.body.serviceName,email:req.body.email,Address:req.body.Address,phoneNumber:req.body.phoneNumber}})
             res.status(200).send({success:true,msg:"user profile has been updated"})
         }
         else{
