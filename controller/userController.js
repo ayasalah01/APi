@@ -172,20 +172,20 @@ const forget_password = async(req,res,next)=>{
     }
 
 }
-// const getRest = async(req,res,next)=>{
-//     try {
-//         const token = req.query.token;
-//         const tokenData = await User.findOne({token:token});
-//         if(tokenData){
-//             res.render("resetPassword",{pageTitle:"ResetPassword",user_id:tokenData._id});
-//         }
-//         else{
-//             res.render("404",{message:"token is invalid"});
-//         }
-//     } catch (error) {
-//         console.log(error)
-//     }
-// }
+const getRest = async(req,res,next)=>{
+    try {
+        const token = req.query.token;
+        const tokenData = await User.findOne({token:token});
+        if(tokenData){
+            return res.sendFile(__dirname + "../view/resetPassword.ejs")
+        }
+        else{
+            return res.status(400).send({message: "You have provided an invalid reset link"});
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
 // const reset_password = async(req,res,next)=>{
 //     try {
 //             const token = req.query.token;
@@ -207,7 +207,8 @@ const reset_password = async(req,res,next)=>{
         const token = req.query.token;
         const tokenData = await User.findOne({token:token});
         if(tokenData){
-            res.render("resetPassword",{pageTitle:"ResetPassword",user_id:tokenData._id});
+            //return res.sendFile(__dirname + "../view/resetPassword.ejs")
+            //res.render("resetPassword",{pageTitle:"ResetPassword",user_id:tokenData._id});
             const new_password = req.body.new_password;
             const  hashedPassword = await securePassword(new_password)
             await User.updateOne({ _id:tokenData._id},{$set:{ password:hashedPassword,token:""}});
@@ -361,7 +362,8 @@ module.exports = {
     postPayment,
     addToCart,
     getCart,
-    Search
+    Search,
+    getRest
     
     
 }

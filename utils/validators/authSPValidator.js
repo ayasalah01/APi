@@ -16,14 +16,14 @@ check('email')
         }
     })
     ),
+check('Address')
+    .not().isEmpty()
+    .withMessage('Address is required'),
 check('phoneNumber')
     .notEmpty()
     .withMessage('phone number required')
     .isMobilePhone()
     .withMessage("Invalid format"),
-check('Address')
-    .not().isEmpty()
-    .withMessage('Address is required'),
 check('password')
     .notEmpty()
     .withMessage('Password required')

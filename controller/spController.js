@@ -21,7 +21,6 @@ const securePassword = (password)=>{
         res.status(400).send(error.message);
     }
 }
-
 const createNewUser = async(req,res,next) =>{
     try {
         const hashPassword = await securePassword (req.body.password);
@@ -30,8 +29,10 @@ const createNewUser = async(req,res,next) =>{
             serviceName:req.body.serviceName,
             email : req.body.email,
             Address: req.body.Address,
+            phoneNumber:req.body.phoneNumber,
             password : hashPassword,
             category:req.body.category,
+            image:req.file.filename
         });
         const userData = await user.save();
         if(userData){
@@ -43,7 +44,8 @@ const createNewUser = async(req,res,next) =>{
             res.status(400).send({success:false,msg:"your register has been failed"})
         }
     } catch (error) {
-        res.status(400).send({success:false},error.message);
+        console.log(error);
+        // res.status(400).send({success:false},error);
     }
 }
 const verifyMail = async(req,res,next)=>{
@@ -174,7 +176,6 @@ const forget_password = async(req,res,next)=>{
 const reset_password = async(req,res,next)=>{
     try {
         const token = req.query.token;
-        
         const tokenData = await ServiceProvider.findOne({token:token})
         if(tokenData){
             const new_password = req.body.new_password;
@@ -260,7 +261,6 @@ const sendVerificationLink = async (req,res,next)=>{
 const spCreatePost = async(req,res,next)=>{
     try {
         const id = req.userId;
-        console.log(id)
         const userData = await ServiceProvider.findById({_id:id})
         console.log(userData.category);
             const service = new Services({

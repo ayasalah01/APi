@@ -25,7 +25,7 @@ const {
 } = require('../utils/validators/authSPValidator');
 const auth = require("../middlewares/auth");
 
-router.post("/SPsignup",signupValidator,spController.createNewUser);
+router.post("/SPsignup",upload.single("image"),signupValidator,spController.createNewUser);
 router.get("/SPverify",spController.verifyMail);
 router.post("/SPsignin",loginValidator,spController.postSignin);
 router.get("/SPlogout",auth,spController.logout);

@@ -35,7 +35,7 @@ router.post("/signin",loginValidator,userController.postSignin);
 router.get("/signout",auth,userController.logout);
 router.post("/updatePassword",auth,changePassword,userController.update_password);
 router.post("/forgetPassword",userController.forget_password);
-//router.get("/resetPassword",userController.getRest)
+router.get("/resetPassword",userController.getRest)
 router.post("/resetPassword",resetValidator,userController.reset_password);
 router.get("/userProfile",auth,userController.getUserProfile);
 router.put("/updateUserProfile",auth,userController.editUserProfile);

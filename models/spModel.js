@@ -17,6 +17,10 @@ const serviceProviderSchema = mongoose.Schema({
         type:String,
         required:true
     },
+    phoneNumber:{
+        type:String,
+        required:true
+    },
     password:{
         type:String,
         required:true
@@ -26,7 +30,7 @@ const serviceProviderSchema = mongoose.Schema({
         required:true,
         enum:["Hotel","Cinema","Bazaar","Village & Resort ","Tourism Company","Restaurant & Cafe","Transport company"]
     },
-    phoneNumber:{
+    image:{
         type:String,
     },
     is_varified:{
