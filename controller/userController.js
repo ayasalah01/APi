@@ -177,7 +177,7 @@ const getRest = async(req,res,next)=>{
         const token = req.query.token;
         const tokenData = await User.findOne({token:token});
         if(tokenData){
-            return res.sendFile(__dirname + "../view/resetPassword.ejs")
+            return res.sendFile(__dirname + '../view/resetPassword.ejs')
         }
         else{
             return res.status(400).send({message: "You have provided an invalid reset link"});
