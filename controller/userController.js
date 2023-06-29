@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const mongoose = require("mongoose");
 const nodemailer = require('nodemailer');
@@ -15,6 +16,7 @@ const Natural = require("../models/natural");
 const sendMail = require("../utils/sendEmail");
 const config = require("../config/config")
 const createToken = require("../utils/createToken");
+const ApiError = require("../utils/ApiError");
 const auth = require("../middlewares/auth")
 // bycrpt password
 const securePassword = (password)=>{
@@ -346,6 +348,97 @@ const Search = async(req,res,next)=>{
         console.log(error)
     }
 }
+
+//forget
+const forgotPassword = async (req, res, next) => {
+    // 1) Get user by email
+    const user = await User.findOne({ email: req.body.email });
+    console.log(user.email)
+    if (!user) {
+        res.status(400).send({success:false ,message:"user email is invaild"})
+    }
+    // 2) If user exist, Generate hash reset random 6 digits and save it in db
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const hashedResetCode = crypto
+      .createHash('sha256')
+      .update(resetCode)
+      .digest('hex');
+  
+    // Save hashed password reset code into db
+    user.passwordResetCode = hashedResetCode;
+    user.passwordResetVerified = false;
+  
+    await user.save();
+  
+    // 3) Send the reset code via email
+    const message = `Hi ${user.username},\n We received a request to reset the password on your MTGY Account. \n ${resetCode} \n Enter this code to complete the reset. \n Thanks for helping us keep your account secure.`;
+    try {
+    await sendMail.sendResetPasswordMail(user.email,message)
+    } catch (err) {
+      user.passwordResetCode = undefined;
+      user.passwordResetExpires = undefined;
+      user.passwordResetVerified = undefined;
+  
+      await user.save();
+      return next(new ApiError('There is an error in sending email', 500));
+    }
+  
+    res
+      .status(200)
+      .json({ status: 'Success', message: 'Reset code sent to email' });
+};
+
+  // @desc    Verify password reset code
+  // @route   POST /api/v1/auth/verifyResetCode
+  // @access  Public
+const verifyPassResetCode = async (req, res, next) => {
+    // 1) Get user based on reset code
+    const hashedResetCode = crypto
+      .createHash('sha256')
+      .update(req.body.resetCode)
+      .digest('hex');
+  
+    const user = await User.findOne({passwordResetCode: hashedResetCode});
+    if (!user) {
+      return next(new ApiError('Reset code invalid or expired'));
+    }
+  
+    // 2) Reset code valid
+    user.passwordResetVerified = true;
+    await user.save();
+  
+    res.status(200).json({
+      status: 'Success',
+    });
+};
+
+  // @desc    Reset password
+  // @route   POST /api/v1/auth/resetPassword
+  // @access  Public
+const resetPassword = async (req, res, next) => {
+    // 1) Get user based on email
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return next(
+        new ApiError(`There is no user with email ${req.body.email}`,404)
+      );
+    }
+  
+    // 2) Check if reset code verified
+    if (!user.passwordResetVerified) {
+      return next(new ApiError('Reset code not verified', 400));
+    }
+  
+    user.password = req.body.newPassword;
+    user.passwordResetCode = undefined;
+    user.passwordResetVerified = undefined;
+  
+    await user.save();
+  
+    // 3) if everything is ok, generate token
+    const token = createToken(user._id);
+    res.status(200).json({ token });
+};
 module.exports = {
     createNewUser,
     verifyMail,
@@ -362,7 +455,9 @@ module.exports = {
     addToCart,
     getCart,
     Search,
-    getRest
-    
+    getRest,
+    forgotPassword,
+    verifyPassResetCode,
+    resetPassword
     
 }

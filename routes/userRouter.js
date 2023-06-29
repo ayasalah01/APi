@@ -45,4 +45,7 @@ router.post("/pay",upload.single('image'),userController.postPayment);
 router.post("/cart",auth,upload.single('image'),userController.addToCart);
 router.get("/cart",auth,userController.getCart);
 router.post("/search",userController.Search);
+router.post('/forgotPassword', userController.forgotPassword);
+router.post('/verifyResetCode', userController.verifyPassResetCode);
+router.put('/resetPassword', userController.resetPassword);
 module.exports = router;

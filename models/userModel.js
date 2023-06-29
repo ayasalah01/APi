@@ -22,6 +22,8 @@ const userSchema = mongoose.Schema({
         type:String,
         required:true
     },
+    passwordResetCode: String,
+    passwordResetVerified: Boolean,
     location:{
         type:String,
         default:"Fayoum"

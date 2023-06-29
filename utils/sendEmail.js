@@ -66,7 +66,7 @@ const sendSPVerificationMail = (email,user_id)=>{
 }
 }
 //send reset user password 
-const sendResetPasswordMail = (email,token)=>{
+const sendResetPasswordMail = (email,message)=>{
     try {
         const transporter = nodemailer.createTransport
         ({
@@ -82,8 +82,10 @@ const sendResetPasswordMail = (email,token)=>{
             const mailOptions = {
                 from: config.emailUser,
                 to: email,
-                subject: 'password Reset',
-                html:'<p>Hi please copy the link to <a href="http://api-mtgy.onrender.com/resetPassword?token='+token+'">Reset</a> your password.</p>'
+                subject: 'Your password reset code (valid for 10 min)',
+                text:message
+                // html:'<p>Hi please copy the link to <a href="http://api-mtgy.onrender.com/resetPassword?token='+token+'">Reset</a> your password.</p>'
+                
             };
             
             transporter.sendMail(mailOptions, function(error, info){
