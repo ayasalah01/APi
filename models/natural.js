@@ -5,6 +5,10 @@ const naturalSchema = mongoose.Schema({
         type:String,
         required:true
     },
+    Address:{
+        type:String,
+        required:true
+    },
     image:{
         type:String,
         required:true
@@ -12,9 +16,6 @@ const naturalSchema = mongoose.Schema({
     About:{
         type:String,
         required:true
-    },
-    available_time:{
-        type:String,
     },
     available_time:{
         type:String,

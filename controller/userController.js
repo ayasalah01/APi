@@ -9,6 +9,8 @@ const User = require('../models/userModel');
 const Pay = require("../models/payModel");
 const Cart = require("../models/cartModel");
 const Services = require("../models/serviceModel");
+const Natural = require("../models/natural");
+
 
 const sendMail = require("../utils/sendEmail");
 const config = require("../config/config")
@@ -337,12 +339,9 @@ const getCart = async(req,res,next)=>{
 const Search = async(req,res,next)=>{
     try {
         const service = req.body.service;
-        console.log(service)
         const data = await Services.findOne({serviceName:service});
-        console.log(data)
-        res.status(200).send({success:true,data:data});
-        // res.render("resultSearch",{data:data});
-        //res.render("/search",{data:data})
+        const info = await Natural.findOne({serviceName:service});
+        res.status(200).send({success:true,data:data,data:info});
     } catch (error) {
         console.log(error)
     }
