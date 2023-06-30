@@ -387,57 +387,50 @@ const forgotPassword = async (req, res, next) => {
       .status(200)
       .json({ status: 'Success', message: 'Reset code sent to email' });
 };
+// Verify password reset code
 
-  // @desc    Verify password reset code
-  // @route   POST /api/v1/auth/verifyResetCode
-  // @access  Public
 const verifyPassResetCode = async (req, res, next) => {
     // 1) Get user based on reset code
     const hashedResetCode = crypto
-      .createHash('sha256')
-      .update(req.body.resetCode)
-      .digest('hex');
-  
+        .createHash('sha256')
+        .update(req.body.resetCode)
+        .digest('hex');
+
     const user = await User.findOne({passwordResetCode: hashedResetCode});
     if (!user) {
-      return next(new ApiError('Reset code invalid or expired'));
+        return next(new ApiError('Reset code invalid or expired'));
     }
-  
     // 2) Reset code valid
     user.passwordResetVerified = true;
     await user.save();
-  
-    res.status(200).json({
-      status: 'Success',
-    });
+    const token = await createToken(user._id);
+    res.status(200).json({success:true,token:token});
 };
 
-  // @desc    Reset password
-  // @route   POST /api/v1/auth/resetPassword
-  // @access  Public
+// Reset password
 const resetPassword = async (req, res, next) => {
-    // 1) Get user based on email
-    const user = await User.findOne({ email: req.body.email });
+    const id = req.userId
+    //const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({_id:id});
+    console.log(user.email)
     if (!user) {
-      return next(
-        new ApiError(`There is no user with email ${req.body.email}`,404)
-      );
+        return next(
+        new ApiError(`There is no user with email ${user.email}`,404)
+    );
     }
-  
     // 2) Check if reset code verified
     if (!user.passwordResetVerified) {
-      return next(new ApiError('Reset code not verified', 400));
+        return next(new ApiError('Reset code not verified', 400));
     }
-  
-    user.password = req.body.newPassword;
+    const new_password = req.body.new_password;
+    const  hashedPassword = await securePassword(new_password)
+    user.password = hashedPassword;
     user.passwordResetCode = undefined;
     user.passwordResetVerified = undefined;
-  
     await user.save();
-  
     // 3) if everything is ok, generate token
-    const token = createToken(user._id);
-    res.status(200).json({ token });
+    //const token = createToken(user._id);
+    res.status(200).send({success:true,message:"success your password has been reseted" });
 };
 module.exports = {
     createNewUser,

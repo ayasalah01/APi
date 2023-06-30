@@ -47,5 +47,5 @@ router.get("/cart",auth,userController.getCart);
 router.post("/search",userController.Search);
 router.post('/forgotPassword', userController.forgotPassword);
 router.post('/verifyResetCode', userController.verifyPassResetCode);
-router.put('/resetPassword', userController.resetPassword);
+router.put('/resetPassword',auth,resetValidator,userController.resetPassword);
 module.exports = router;

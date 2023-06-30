@@ -17,8 +17,12 @@ const naturalSchema = mongoose.Schema({
         type:String,
         required:true
     },
+    available_day:{
+        type:String,
+    },
     available_time:{
         type:String,
+        required:true
     },
     category:{
         type:String,

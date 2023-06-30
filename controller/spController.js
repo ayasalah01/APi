@@ -263,11 +263,9 @@ const spCreatePost = async(req,res,next)=>{
         const id = req.userId;
         const userData = await ServiceProvider.findById({_id:id})
         console.log(userData.category);
-            const service = new Natural({
+            const service = new Services({
                 offerTitle:req.body.offerTitle,
                 postDetails:req.body.postDetails,
-                Address:req.body.Address,
-                About:req.body.About,
                 price:req.body.price,
                 category:userData.category,
                 serviceName:userData.serviceName,
