@@ -37,6 +37,7 @@ router.put("/updateSPProfile",auth,spController.editUserProfile);
 router.delete("/SPdelete",spController.deleteUserAccount);
 router.post("/SPemailVerification",spController.sendVerificationLink);
 router.post("/createPost",auth,upload.single('image'),spController.spCreatePost);
+router.get("/partnerOffer",auth,spController.getPartnerOffer);
 router.get("/Hotel",spController.Hotel);
 router.get("/Cinema",spController.Cinema);
 router.get("/Bazaar",spController.Bazaar);

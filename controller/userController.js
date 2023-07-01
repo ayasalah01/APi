@@ -292,6 +292,7 @@ const sendVerificationLink = async (req,res,next)=>{
         console.log(error.message);
     }
 }
+
 //payment method
 const postPayment = async(req,res,next)=>{
     try {

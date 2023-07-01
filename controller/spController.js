@@ -285,6 +285,19 @@ const spCreatePost = async(req,res,next)=>{
         res.status(500).send({success:false,msg:error.message})
     }
 }
+const getPartnerOffer = async (req,res,next)=>{
+    try {
+        const id = req.userId;
+        const userData = await ServiceProvider.findById({_id:id})
+        console.log(userData.category);
+        const users = await Services.find({category:userData.category});
+        console.log(users);
+        res.status(200).send({success:true,data:users});
+
+    } catch (error) {
+        console.log(error.message);
+    }
+}
 // get services
 const Hotel = async(req,res,next)=>{
     try {
@@ -322,7 +335,6 @@ const ResortAndVillage = async(req,res,next)=>{
 const NaturalPreserve = async(req,res,next)=>{
     try {
         const users = await Natural.find({category:"Natural Preserve"});
-        
         res.status(200).send({success:true, data:users});
     } catch (error) {
         console.log(error.message);
@@ -386,6 +398,7 @@ module.exports = {
     deleteUserAccount,
     sendVerificationLink,
     spCreatePost,
+    getPartnerOffer,
     Hotel,
     Cinema,
     Bazaar,
