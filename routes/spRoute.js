@@ -30,8 +30,6 @@ router.get("/SPverify",spController.verifyMail);
 router.post("/SPsignin",loginValidator,spController.postSignin);
 router.get("/SPlogout",auth,spController.logout);
 router.post("/SPupdatePassword",auth,changePassword,spController.update_password);
-router.post("/SPforgetPassword",spController.forget_password);
-router.post("/reset-password",resetValidator,spController.reset_password);
 router.get("/SPProfile",auth,spController.getUserProfile);
 router.put("/updateSPProfile",auth,spController.editUserProfile);
 router.delete("/SPdelete",spController.deleteUserAccount);
@@ -48,6 +46,9 @@ router.get("/ArchaeologicalSite",spController.ArchaeologicalSite);
 router.get("/RestaurantAndCafe",spController.RestaurantAndCafe);
 router.get("/TransportationCompany",spController.TransportationCompany);
 router.get("/spProfile",spController.getSPProfile_forClient);
+router.post('/spForgotPassword', spController.forgotPassword);
+router.post('/spVerifyResetCode', spController.verifyPassResetCode);
+router.put('/spResetPassword',auth,resetValidator,spController.resetPassword);
 
 
 

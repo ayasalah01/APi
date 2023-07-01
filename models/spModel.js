@@ -25,6 +25,8 @@ const serviceProviderSchema = mongoose.Schema({
         type:String,
         required:true
     },
+    passwordResetCode: String,
+    passwordResetVerified: Boolean,
     category:{
         type:String,
         required:true,

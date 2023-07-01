@@ -1,5 +1,6 @@
 
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const mongoose = require("mongoose");
 const MongoClient = require('mongodb').MongoClient
 const bcrypt = require('bcryptjs');
@@ -10,7 +11,9 @@ const ServiceProvider = require('../models/spModel');
 const Services = require("../models/serviceModel");
 const Natural = require("../models/natural")
 const createToken = require("../utils/createToken");
+const ApiError = require("../utils/ApiError");
 const auth = require("../middlewares/auth");
+const { parse } = require('dotenv');
 
 //bycrpt password
 const securePassword = (password)=>{
@@ -152,47 +155,47 @@ const update_password = async(req,res,next)=>{
 }
 
 //reset forgetten password
-const forget_password = async(req,res,next)=>{
-    try{
-        const email = req.body.email
-        const userData = await ServiceProvider.findOne({email:email})
-        console.log(userData.email);
-        if(userData){
-            const randomString = randomstring.generate();
-            const Data = await ServiceProvider.updateOne({email:email},{$set:{token:randomString}});
-            sendMail.sendSPResetPasswordMail(userData.email,randomString);
-            res.status(200).send({success:true, msg:"Please check your email inbox"})
+// const forget_password = async(req,res,next)=>{
+//     try{
+//         const email = req.body.email
+//         const userData = await ServiceProvider.findOne({email:email})
+//         console.log(userData.email);
+//         if(userData){
+//             const randomString = randomstring.generate();
+//             const Data = await ServiceProvider.updateOne({email:email},{$set:{token:randomString}});
+//             sendMail.sendSPResetPasswordMail(userData.email,randomString);
+//             res.status(200).send({success:true, msg:"Please check your email inbox"})
 
-        }
-        else{
-            res.status(200).send({success:true, msg:"this email does not exists"})
-        }
-    }
-    catch(error)
-    {
-        res.status(400).send({success:false, msg:error.message});
-    }
-}
-const reset_password = async(req,res,next)=>{
-    try {
-        const token = req.query.token;
-        const tokenData = await ServiceProvider.findOne({token:token})
-        if(tokenData){
-            const new_password = req.body.new_password;
-            const  hashedPassword = await securePassword(new_password);
+//         }
+//         else{
+//             res.status(200).send({success:true, msg:"this email does not exists"})
+//         }
+//     }
+//     catch(error)
+//     {
+//         res.status(400).send({success:false, msg:error.message});
+//     }
+// }
+// const reset_password = async(req,res,next)=>{
+//     try {
+//         const token = req.query.token;
+//         const tokenData = await ServiceProvider.findOne({token:token})
+//         if(tokenData){
+//             const new_password = req.body.new_password;
+//             const  hashedPassword = await securePassword(new_password);
             
-            await ServiceProvider.updateOne({ _id:tokenData._id},{$set:{password:hashedPassword}})
-            res.status(200).send({success:true, msg:"password has been reseted"})
-        }
-        else{
-            res.status(201).send({success:false, msg:"This link has been expired"})
-        }
+//             await ServiceProvider.updateOne({ _id:tokenData._id},{$set:{password:hashedPassword}})
+//             res.status(200).send({success:true, msg:"password has been reseted"})
+//         }
+//         else{
+//             res.status(201).send({success:false, msg:"This link has been expired"})
+//         }
         
-    } catch (error) {
-        res.status(400).send({success:false, msg:error.message});
-    }
+//     } catch (error) {
+//         res.status(400).send({success:false, msg:error.message});
+//     }
 
-}
+// }
 //profile
 const getUserProfile = async(req,res,next)=>{
         try {
@@ -291,7 +294,7 @@ const getPartnerOffer = async (req,res,next)=>{
         const userData = await ServiceProvider.findById({_id:id})
         console.log(userData.category);
         const users = await Services.find({category:userData.category});
-        console.log(users);
+        //console.log("data :",users);
         res.status(200).send({success:true,data:users});
 
     } catch (error) {
@@ -384,6 +387,85 @@ const getSPProfile_forClient = async(req,res,next)=>{
     }
 }
 
+//forget
+const forgotPassword = async (req, res, next) => {
+    // 1) Get user by email
+    const user = await ServiceProvider.findOne({ email: req.body.email });
+    console.log(user.email)
+    if (!user) {
+        res.status(400).send({success:false ,message:"user email is invaild"})
+    }
+    // 2) If user exist, Generate hash reset random 6 digits and save it in db
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const hashedResetCode = crypto
+        .createHash('sha256')
+        .update(resetCode)
+        .digest('hex');
+  
+    // Save hashed password reset code into db
+    user.passwordResetCode = hashedResetCode;
+    user.passwordResetVerified = false;
+  
+    await user.save();
+  
+    // 3) Send the reset code via email
+    const message = `Hi ${user.serviceName},\n We received a request to reset the password on your MTGY Account. \n ${resetCode} \n Enter this code to complete the reset. \n Thanks for helping us keep your account secure.`;
+    try {
+    await sendMail.sendResetPasswordMail(user.email,message)
+    } catch (err) {
+        user.passwordResetCode = undefined;
+        user.passwordResetExpires = undefined;
+        user.passwordResetVerified = undefined;
+        await user.save();
+        return next(new ApiError('There is an error in sending email', 500));
+    }
+    res.status(200).json({ status: 'Success', message: 'Reset code sent to email' });
+};
+// Verify password reset code
+
+const verifyPassResetCode = async (req, res, next) => {
+    // 1) Get user based on reset code
+    const hashedResetCode = crypto
+        .createHash('sha256')
+        .update(req.body.resetCode)
+        .digest('hex');
+
+    const user = await ServiceProvider.findOne({passwordResetCode: hashedResetCode});
+    if (!user) {
+        return next(new ApiError('Reset code invalid or expired'));
+    }
+    // 2) Reset code valid
+    user.passwordResetVerified = true;
+    await user.save();
+    const token = await createToken(user._id);
+    res.status(200).json({success:true,token:token});
+};
+// Reset password
+const resetPassword = async (req, res, next) => {
+    const id = req.userId
+    //const user = await User.findOne({ email: req.body.email });
+    const user = await ServiceProvider.findOne({_id:id});
+    console.log(user.email)
+    if (!user) {
+        return next(
+        new ApiError(`There is no user with email ${user.email}`,404)
+    );
+    }
+    // 2) Check if reset code verified
+    if (!user.passwordResetVerified) {
+        return next(new ApiError('Reset code not verified', 400));
+    }
+    const new_password = req.body.new_password;
+    const  hashedPassword = await securePassword(new_password)
+    user.password = hashedPassword;
+    user.passwordResetCode = undefined;
+    user.passwordResetVerified = undefined;
+    await user.save();
+    // 3) if everything is ok, generate token
+    //const token = createToken(user._id);
+    res.status(200).send({success:true,message:"success your password has been reseted" });
+};
+
 module.exports = {
     createNewUser,
     verifyMail,
@@ -391,8 +473,6 @@ module.exports = {
     verfiyLogin,
     logout,
     update_password,
-    forget_password,
-    reset_password,
     getUserProfile,
     editUserProfile,
     deleteUserAccount,
@@ -408,5 +488,8 @@ module.exports = {
     ArchaeologicalSite,
     RestaurantAndCafe,
     TransportationCompany,
-    getSPProfile_forClient
+    getSPProfile_forClient,
+    forgotPassword,
+    verifyPassResetCode,
+    resetPassword
 }

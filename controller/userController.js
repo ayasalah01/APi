@@ -155,78 +155,78 @@ const update_password = async(req,res,next)=>{
 }
 
 // reset forgetten password
-const forget_password = async(req,res,next)=>{
-    try{
-        const email = req.body.email
-        const userData = await User.findOne({ email:email })
-        console.log(userData.email);
-        if(userData){
-            const randomString = randomstring.generate();
-            const Data = await User.updateOne({email:email},{$set:{token:randomString}});
-            sendMail.sendResetPasswordMail(userData.email,randomString);
-            res.status(200).send({success:true, msg:"Please check your email inbox"})
-        }
-        else{
-            res.status(200).send({success:true, msg:"this email does not exists"})
-        }
-    }
-    catch(error)
-    {
-        res.status(400).send({success:false, msg:error.message});
-    }
+// const forget_password = async(req,res,next)=>{
+//     try{
+//         const email = req.body.email
+//         const userData = await User.findOne({ email:email })
+//         console.log(userData.email);
+//         if(userData){
+//             const randomString = randomstring.generate();
+//             const Data = await User.updateOne({email:email},{$set:{token:randomString}});
+//             sendMail.sendResetPasswordMail(userData.email,randomString);
+//             res.status(200).send({success:true, msg:"Please check your email inbox"})
+//         }
+//         else{
+//             res.status(200).send({success:true, msg:"this email does not exists"})
+//         }
+//     }
+//     catch(error)
+//     {
+//         res.status(400).send({success:false, msg:error.message});
+//     }
 
-}
-const getRest = async(req,res,next)=>{
-    try {
-        const token = req.query.token;
-        const tokenData = await User.findOne({token:token});
-        if(tokenData){
-            return res.sendFile(__dirname + '../view/resetPassword.ejs')
-        }
-        else{
-            return res.status(400).send({message: "You have provided an invalid reset link"});
-        }
-    } catch (error) {
-        console.log(error)
-    }
-}
+// }
+// const getRest = async(req,res,next)=>{
+//     try {
+//         const token = req.query.token;
+//         const tokenData = await User.findOne({token:token});
+//         if(tokenData){
+//             return res.sendFile(__dirname + '../view/resetPassword.ejs')
+//         }
+//         else{
+//             return res.status(400).send({message: "You have provided an invalid reset link"});
+//         }
+//     } catch (error) {
+//         console.log(error)
+//     }
+// }
+// // const reset_password = async(req,res,next)=>{
+// //     try {
+// //             const token = req.query.token;
+// //             const tokenData = await User.findOne({token:token});
+// //             const new_password = req.body.new_password;
+            
+// //             const  hashedPassword = await securePassword(new_password)
+// //             await User.updateOne({ _id:tokenData._id},{$set:{ password:hashedPassword,token:""}});
+// //             res.status(200).json({success:true, msg:"password has been reseted"})
+        
+        
+// //     } catch (error) {
+// //         res.status(400).send({success:false, msg:error.message});
+// //     }
+
+// // }
 // const reset_password = async(req,res,next)=>{
 //     try {
-//             const token = req.query.token;
-//             const tokenData = await User.findOne({token:token});
+//         const token = req.query.token;
+//         const tokenData = await User.findOne({token:token});
+//         if(tokenData){
+//             //return res.sendFile(__dirname + "../view/resetPassword.ejs")
+//             //res.render("resetPassword",{pageTitle:"ResetPassword",user_id:tokenData._id});
 //             const new_password = req.body.new_password;
-            
 //             const  hashedPassword = await securePassword(new_password)
 //             await User.updateOne({ _id:tokenData._id},{$set:{ password:hashedPassword,token:""}});
-//             res.status(200).json({success:true, msg:"password has been reseted"})
-        
+//             res.status(200).send({success:true, msg:"password has been reseted"})
+//         }
+//         else{
+//             res.status(200).send({success:false, msg:"This link has been expired"})
+//         }
         
 //     } catch (error) {
 //         res.status(400).send({success:false, msg:error.message});
 //     }
 
 // }
-const reset_password = async(req,res,next)=>{
-    try {
-        const token = req.query.token;
-        const tokenData = await User.findOne({token:token});
-        if(tokenData){
-            //return res.sendFile(__dirname + "../view/resetPassword.ejs")
-            //res.render("resetPassword",{pageTitle:"ResetPassword",user_id:tokenData._id});
-            const new_password = req.body.new_password;
-            const  hashedPassword = await securePassword(new_password)
-            await User.updateOne({ _id:tokenData._id},{$set:{ password:hashedPassword,token:""}});
-            res.status(200).send({success:true, msg:"password has been reseted"})
-        }
-        else{
-            res.status(200).send({success:false, msg:"This link has been expired"})
-        }
-        
-    } catch (error) {
-        res.status(400).send({success:false, msg:error.message});
-    }
-
-}
 //profile
 const getUserProfile = async(req,res,next)=>{
     // const email = req.body.email
@@ -407,7 +407,6 @@ const verifyPassResetCode = async (req, res, next) => {
     const token = await createToken(user._id);
     res.status(200).json({success:true,token:token});
 };
-
 // Reset password
 const resetPassword = async (req, res, next) => {
     const id = req.userId
@@ -439,8 +438,6 @@ module.exports = {
     postSignin,
     logout,
     update_password,
-    forget_password,
-    reset_password,
     getUserProfile,
     editUserProfile,
     deleteUserAccount,
@@ -449,7 +446,6 @@ module.exports = {
     addToCart,
     getCart,
     Search,
-    getRest,
     forgotPassword,
     verifyPassResetCode,
     resetPassword
