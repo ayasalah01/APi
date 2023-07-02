@@ -11,6 +11,7 @@ const Pay = require("../models/payModel");
 const Cart = require("../models/cartModel");
 const Services = require("../models/serviceModel");
 const Natural = require("../models/natural");
+const Review = require("../models/reviewModel");
 
 
 const sendMail = require("../utils/sendEmail");
@@ -307,7 +308,7 @@ const postPayment = async(req,res,next)=>{
             res.status(200).send({success:true,message:"payment process has been failed please try again "});
         }
     } catch (error) {
-        console.log(error.message);
+        res.status(500).send({success:false, msg:error.message});
     }
 }
 //cart
@@ -432,6 +433,36 @@ const resetPassword = async (req, res, next) => {
     //const token = createToken(user._id);
     res.status(200).send({success:true,message:"success your password has been reseted" });
 };
+
+// get review
+const getRate = async (req,res,next)=>{
+    try {
+        const id = req.params.id
+        const user_id = req.userId
+        const data = await Review.find({userId:user_id});
+        res.status(200).send({success:true,sp_id:id,data:data });
+    } catch (error) {
+        res.status(500).send({success:false, msg:error.message});
+    }
+};
+// add review
+const review = async(req,res,next)=>{
+    try {
+        const id = req.userId
+        const userData = await User.findOne({_id:id})
+        const data = new Review({
+            rate:req.body.rate,
+            comment:req.body.comment,
+            sp_id:req.body.sp_id,
+            userId:id,
+            username:userData.username
+        })
+        const review = await data.save();
+        res.status(200).send({success:true,message:"success your review has been inserted" });
+    } catch (error) {
+        res.status(500).send({success:false, msg:error.message});
+    }
+};
 module.exports = {
     createNewUser,
     verifyMail,
@@ -448,6 +479,8 @@ module.exports = {
     Search,
     forgotPassword,
     verifyPassResetCode,
-    resetPassword
+    resetPassword,
+    getRate,
+    review
     
 }

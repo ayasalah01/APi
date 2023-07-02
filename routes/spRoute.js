@@ -45,7 +45,7 @@ router.get("/TourismCompany",spController.TourismCompany);
 router.get("/ArchaeologicalSite",spController.ArchaeologicalSite);
 router.get("/RestaurantAndCafe",spController.RestaurantAndCafe);
 router.get("/TransportationCompany",spController.TransportationCompany);
-router.get("/spProfile",spController.getSPProfile_forClient);
+router.get("/spProfile_client/:id",spController.getSPProfile_forClient);
 router.post('/spForgotPassword', spController.forgotPassword);
 router.post('/spVerifyResetCode', spController.verifyPassResetCode);
 router.put('/spResetPassword',auth,resetValidator,spController.resetPassword);

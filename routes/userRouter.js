@@ -45,4 +45,6 @@ router.post("/search",userController.Search);
 router.post('/forgotPassword', userController.forgotPassword);
 router.post('/verifyResetCode', userController.verifyPassResetCode);
 router.put('/resetPassword',auth,resetValidator,userController.resetPassword);
+router.get("/review/:id",auth,userController.getRate);
+router.post ("/addReview",auth,userController.review);
 module.exports = router;

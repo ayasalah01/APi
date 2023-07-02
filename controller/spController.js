@@ -386,7 +386,6 @@ const getSPProfile_forClient = async(req,res,next)=>{
         res.status(500).send({success:false,msg:error.message})
     }
 }
-
 //forget
 const forgotPassword = async (req, res, next) => {
     // 1) Get user by email
