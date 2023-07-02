@@ -49,6 +49,7 @@ router.get("/spProfile_client/:id",spController.getSPProfile_forClient);
 router.post('/spForgotPassword', spController.forgotPassword);
 router.post('/spVerifyResetCode', spController.verifyPassResetCode);
 router.put('/spResetPassword',auth,resetValidator,spController.resetPassword);
+router.get("/getReview",auth,spController.getRate);
 
 
 

@@ -314,16 +314,15 @@ const postPayment = async(req,res,next)=>{
 //cart
 const addToCart = async(req,res,next)=>{
     try {
-        //const id = req.userId;
+        const id = req.userId;
         const data = await new Cart({
             service:req.body.service,
             amount :req.body.amount,
             price:req.body.price,
             category:req.body.category,
-            userId:req.userId,
+            userId:id,
             image:req.body.image
-
-        })
+        });
         const cart = await data.save();
         res.status(200).send({success:true,cart:cart});
     } catch (error) {
@@ -350,7 +349,6 @@ const Search = async(req,res,next)=>{
         console.log(error)
     }
 }
-
 //forget
 const forgotPassword = async (req, res, next) => {
     // 1) Get user by email

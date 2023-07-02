@@ -9,7 +9,8 @@ const randomstring = require("randomstring");
 const sendMail = require("../utils/sendEmail")
 const ServiceProvider = require('../models/spModel');
 const Services = require("../models/serviceModel");
-const Natural = require("../models/natural")
+const Natural = require("../models/natural");
+const Review = require("../models/reviewModel");
 const createToken = require("../utils/createToken");
 const ApiError = require("../utils/ApiError");
 const auth = require("../middlewares/auth");
@@ -464,6 +465,17 @@ const resetPassword = async (req, res, next) => {
     //const token = createToken(user._id);
     res.status(200).send({success:true,message:"success your password has been reseted" });
 };
+//get reviews
+const getRate = async (req,res,next)=>{
+    try {
+        const id = req.userId;
+        const data = await Review.find({sp_id:id});
+        console.log(data)
+        res.status(200).send({success:true,data:data});
+    } catch (error) {
+        res.status(500).send({success:false,msg:error.message})
+    }
+}
 
 module.exports = {
     createNewUser,
@@ -490,5 +502,6 @@ module.exports = {
     getSPProfile_forClient,
     forgotPassword,
     verifyPassResetCode,
-    resetPassword
+    resetPassword,
+    getRate
 }
