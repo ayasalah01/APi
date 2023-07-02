@@ -297,7 +297,9 @@ const sendVerificationLink = async (req,res,next)=>{
 //payment method
 const postPayment = async(req,res,next)=>{
     try {
+        const id = req.userId;
         const pay = new Pay({
+            userId:id,
             image:req.file.filename
         });
         const data = await pay.save();
@@ -305,7 +307,7 @@ const postPayment = async(req,res,next)=>{
             res.status(200).send({success:true,message:"payment process has been successfully "});
         }
         else{
-            res.status(200).send({success:true,message:"payment process has been failed please try again "});
+            res.status(200).send({success:false,message:"payment process has been failed please try again "});
         }
     } catch (error) {
         res.status(500).send({success:false, msg:error.message});
