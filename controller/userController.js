@@ -345,8 +345,15 @@ const Search = async(req,res,next)=>{
     try {
         const service = req.body.service;
         const data = await Services.findOne({serviceName:service});
-        const info = await Natural.findOne({serviceName:service});
-        res.status(200).send({success:true,data:data,data:info});
+        if(data){
+            res.status(200).send({success:true,data:data});
+        }
+        else{
+            const info = await Natural.findOne({serviceName:service});
+            res.status(200).send({success:true,data:info});
+        }
+        //const info = await Natural.findOne({serviceName:service});
+        //res.status(200).send({success:true,data:data});
     } catch (error) {
         console.log(error)
     }
@@ -362,32 +369,30 @@ const forgotPassword = async (req, res, next) => {
     // 2) If user exist, Generate hash reset random 6 digits and save it in db
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
     const hashedResetCode = crypto
-      .createHash('sha256')
-      .update(resetCode)
-      .digest('hex');
-  
+        .createHash('sha256')
+        .update(resetCode)
+        .digest('hex');
+
     // Save hashed password reset code into db
     user.passwordResetCode = hashedResetCode;
     user.passwordResetVerified = false;
-  
+
     await user.save();
-  
     // 3) Send the reset code via email
     const message = `Hi ${user.username},\n We received a request to reset the password on your MTGY Account. \n ${resetCode} \n Enter this code to complete the reset. \n Thanks for helping us keep your account secure.`;
     try {
     await sendMail.sendResetPasswordMail(user.email,message)
     } catch (err) {
-      user.passwordResetCode = undefined;
-      user.passwordResetExpires = undefined;
-      user.passwordResetVerified = undefined;
-  
-      await user.save();
-      return next(new ApiError('There is an error in sending email', 500));
+        user.passwordResetCode = undefined;
+        user.passwordResetExpires = undefined;
+        user.passwordResetVerified = undefined;
+
+        await user.save();
+        return next(new ApiError('There is an error in sending email', 500));
     }
-  
     res
-      .status(200)
-      .json({ status: 'Success', message: 'Reset code sent to email' });
+        .status(200)
+        .json({ status: 'Success', message: 'Reset code sent to email' });
 };
 // Verify password reset code
 
