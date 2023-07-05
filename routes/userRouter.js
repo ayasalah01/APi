@@ -38,6 +38,8 @@ router.get("/userProfile",auth,userController.getUserProfile);
 router.put("/updateUserProfile",auth,userController.editUserProfile);
 router.delete("/delete",userController.deleteUserAccount);
 router.post("/emailVerification",userController.sendVerificationLink);
+router.post("/createOrder",auth,userController.createOrder);
+router.get("/pay:id",userController.getPayment);
 router.post("/pay",auth,upload.single('image'),userController.postPayment);
 router.post("/addtocart",auth,upload.single('image'),userController.addToCart);
 router.get("/getcart",auth,userController.getCart);

@@ -207,6 +207,75 @@ const sendMsg_deleteAccountMail = (email)=>{
 
 }
 
+// send notfiy mail for sp who create offer
+const sendSPNotifyMail = (email,username)=>{
+    try {
+        const transporter = nodemailer.createTransport
+        ({
+            host:'smtp.gmail.com',
+            port:587,
+            secure:false,
+            requireTLS:true,
+            auth:{
+                user:config.emailUser,
+                pass:config.passwordUser
+            }
+        });
+            const mailOptions = {
+                from: config.emailUser,
+                to: email,
+                subject: 'Notification Mail For New Oder',
+                html:`Hi We received a request to create new order on your MTGY Account from ${username} user. `
+            };
+            
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
+            })
+
+    } catch (error) {
+        console.log(error)
+    }
+
+}
+//send notfiy mail for sp who pay for order
+const sendSPNotifyMailforPay = (email,username)=>{
+    try {
+        const transporter = nodemailer.createTransport
+        ({
+            host:'smtp.gmail.com',
+            port:587,
+            secure:false,
+            requireTLS:true,
+            auth:{
+                user:config.emailUser,
+                pass:config.passwordUser
+            }
+        });
+            const mailOptions = {
+                from: config.emailUser,
+                to: email,
+                subject: 'Notification Mail For Payment ',
+                html:`Hi We received a new payment process on your MTGY Account from ${username} user. `
+            };
+            
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
+            })
+
+    } catch (error) {
+        console.log(error)
+    }
+
+}
+
 
 module.exports = {
     sendVerificationMail,
@@ -214,5 +283,7 @@ module.exports = {
     sendResetPasswordMail,
     sendSPResetPasswordMail,
     sendAdminNotifyMail,
-    sendMsg_deleteAccountMail
+    sendMsg_deleteAccountMail,
+    sendSPNotifyMail,
+    sendSPNotifyMailforPay
 }

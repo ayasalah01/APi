@@ -7,6 +7,7 @@ const nodemailer = require('nodemailer');
 const randomstring = require('randomstring')
 
 const User = require('../models/userModel');
+const Order = require("../models/orderModel");
 const Pay = require("../models/payModel");
 const Cart = require("../models/cartModel");
 const Services = require("../models/serviceModel");
@@ -293,15 +294,53 @@ const sendVerificationLink = async (req,res,next)=>{
         console.log(error.message);
     }
 }
-
+//create new order
+const createOrder = async(req,res,next)=>{
+    try {
+        const id = req.userId;
+        const user = await User.findById({_id:id});
+        const order = await new Order({
+            service:req.body.service,
+            qauntity:req.body.qauntity,
+            price:req.body.price,
+            category:req.body.category,
+            userId:id,
+            sp_id:req.body.sp_id
+        })
+        const data = await order.save();
+        const sp = await ServiceProvider.findById({_id:data.sp_id});
+        await sendMail.sendSPNotifyMail(sp.email,user.username);
+        res.status(200).send({success:true,data:data});
+    } 
+    catch (error) {
+        res.status(500).send({success:false, msg:error.message});
+    }
+}
+const getPayment = async(req,res,next)=>{
+    try {
+        const id = req.params.id;
+        const data = await Order.findById({_id:id});
+        res.status(200).send({success:true,data:data});
+        //res.render("pay",{data:data});
+    } catch (error) {
+        res.status(500).send({success:false, msg:error.message});
+    }
+}
 //payment method
 const postPayment = async(req,res,next)=>{
     try {
         const id = req.userId;
+        const user = await User.findById({_id:id});
+        const sp = await ServiceProvider.findById({_id:req.body.sp_id});
         const pay = new Pay({
+            sp_id:req.body.sp_id,
             userId:id,
-            image:req.file.filename
+            service:req.body.service,
+            price:req.body.price,
+            image:req.file.filename,
+            
         });
+        await sendMail.sendSPNotifyMailforPay(sp.email,user.username);
         const data = await pay.save();
         if(data){
             res.status(200).send({success:true,message:"payment process has been successfully "});
@@ -438,7 +477,6 @@ const resetPassword = async (req, res, next) => {
     //const token = createToken(user._id);
     res.status(200).send({success:true,message:"success your password has been reseted" });
 };
-
 // get review
 const getRate = async (req,res,next)=>{
     try {
@@ -478,6 +516,8 @@ module.exports = {
     editUserProfile,
     deleteUserAccount,
     sendVerificationLink,
+    createOrder,
+    getPayment,
     postPayment,
     addToCart,
     getCart,
