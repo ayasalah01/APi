@@ -2,17 +2,41 @@ const express = require('express')
 const router = require('express').Router();
 const multer = require("multer");
 const path = require('path');
+// const config = require("../config/config");
+// const cloudinary = require("cloudinary");
 
 
+// const storage = multer.diskStorage({
+//     destination:(req,file,cb)=>{
+//         cb(null,path.join(__dirname,"../public/userImages"));
+//     },
+//     filename:(req,file,cb)=>{
+//         cb(null, file.originalname + '-' + Date.now()) 
+        
+//     }
+// })
 const storage = multer.diskStorage({
     destination:(req,file,cb)=>{
         cb(null,path.join(__dirname,"../public/userImages"));
+        
     },
     filename:(req,file,cb)=>{
-        cb(null, file.originalname + '-' + Date.now()) 
+        //cb(null, file.originalname + '-' + Date.now()) 
+        return cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`)
         
     }
 })
+
+// const handlerMultipartData = multer({
+//     storage:storage,
+//     limits:{ fieldSize:1000000*5 }
+// }).single('image')
+
+// cloudinary.config({
+//     cloud_name:config.cloud_name  ,
+//     api_key:config.api_key ,
+//     api_secret: config.api_secret
+// })
 const upload = multer({storage:storage});
 
 
@@ -34,6 +58,7 @@ router.get("/SPProfile",auth,spController.getUserProfile);
 router.put("/updateSPProfile",auth,spController.editUserProfile);
 router.delete("/SPdelete",spController.deleteUserAccount);
 router.post("/SPemailVerification",spController.sendVerificationLink);
+//router.post("/createPost",auth,handlerMultipartData,spController.spCreatePost)
 router.post("/createPost",auth,upload.single('image'),spController.spCreatePost);
 router.get("/partnerOffer",auth,spController.getPartnerOffer);
 router.get("/Hotel",spController.Hotel);

@@ -274,7 +274,8 @@ const spCreatePost = async(req,res,next)=>{
                 category:userData.category,
                 serviceName:userData.serviceName,
                 sp_id:userData._id,
-                image:req.file.filename
+                //image: req.file.filename
+                image: `https://api-mtgy.onrender.com/image/${req.file.filename}`
             });
             const post = await service.save();
             if(post){

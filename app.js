@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const dotenv = require('dotenv').config;
 const mongoose = require("mongoose");
+
 //const DB_URL = "mongodb://127.0.0.1/mydatabase";
 
 
@@ -22,6 +23,7 @@ const app = express();
 
 app.use(morgan("dev"));
 app.use(bodyParser.json());
+app.use('/image', express.static('./public/userImages'));
 
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
