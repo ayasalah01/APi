@@ -36,7 +36,7 @@ const createNewUser = async(req,res,next) =>{
             phoneNumber:req.body.phoneNumber,
             password : hashPassword,
             category:req.body.category,
-            image:req.file.filename
+            image: `https://api-mtgy.onrender.com/image/${req.file.filename}`
         });
         const userData = await user.save();
         if(userData){

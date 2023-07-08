@@ -17,7 +17,7 @@ const paySchema = mongoose.Schema({
         ref:"service"
     },
     price:{
-        type:String,
+        type:Number,
         ref:"service"
     },
     image:{

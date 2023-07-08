@@ -11,7 +11,7 @@ const cartSchema = mongoose.Schema({
         default:1
     },
     price:{
-        type:String,
+        type:Number,
         ref:"service"
     },
     category:{

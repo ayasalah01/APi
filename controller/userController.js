@@ -337,7 +337,7 @@ const postPayment = async(req,res,next)=>{
             userId:id,
             service:req.body.service,
             price:req.body.price,
-            image:req.file.filename,
+            image: `https://api-mtgy.onrender.com/image/${req.file.filename}`,
             
         });
         await sendMail.sendSPNotifyMailforPay(sp.email,user.username);
