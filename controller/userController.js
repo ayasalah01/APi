@@ -7,6 +7,7 @@ const nodemailer = require('nodemailer');
 const randomstring = require('randomstring')
 
 const User = require('../models/userModel');
+const ServiceProvider = require("../models/spModel");
 const Order = require("../models/orderModel");
 const Pay = require("../models/payModel");
 const Cart = require("../models/cartModel");
@@ -298,6 +299,8 @@ const sendVerificationLink = async (req,res,next)=>{
 const createOrder = async(req,res,next)=>{
     try {
         const id = req.userId;
+        const sp_id= req.body.sp_id
+        console.log(sp_id);
         const user = await User.findById({_id:id});
         const order = await new Order({
             service:req.body.service,
@@ -305,8 +308,9 @@ const createOrder = async(req,res,next)=>{
             price:req.body.price,
             category:req.body.category,
             userId:id,
-            sp_id:req.body.sp_id
+            sp_id:sp_id
         })
+        
         const data = await order.save();
         const sp = await ServiceProvider.findById({_id:data.sp_id});
         await sendMail.sendSPNotifyMail(sp.email,user.username);
